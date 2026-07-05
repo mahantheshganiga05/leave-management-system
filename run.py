@@ -12,7 +12,6 @@ app = create_app(os.environ.get('FLASK_CONFIG', 'development'))
 
 @app.shell_context_processor
 def make_shell_context():
-    """Enables `flask shell` to have all models pre-imported."""
     return dict(
         db=db, User=User, Role=Role, Department=Department, Course=Course,
         Student=Student, Faculty=Faculty, Parent=Parent, LeaveRequest=LeaveRequest,
@@ -21,5 +20,6 @@ def make_shell_context():
     )
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=app.config.get('DEBUG', False))
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

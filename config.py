@@ -9,10 +9,9 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL',
-        'mysql+pymysql://root:password@localhost:3306/leave_management'
-    )
+    # ✅ IMPORTANT FIX (Render PostgreSQL)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
 
@@ -34,7 +33,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', MAIL_USERNAME)
-    # If no mail credentials are configured, emails are printed to console instead of sent.
+
     MAIL_SUPPRESS_SEND = MAIL_USERNAME is None
 
     # Rate limiting
