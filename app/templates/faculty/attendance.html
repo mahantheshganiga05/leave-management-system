@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Mark Attendance{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Mark Attendance</h4>
+
+<form method="GET" class="row g-2 align-items-end mb-4">
+  <div class="col-auto">
+    <label class="form-label small">Date</label>
+    <input type="date" name="date" value="{{ selected_date }}" class="form-control" onchange="this.form.submit()">
+  </div>
+</form>
+
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="date" value="{{ selected_date }}">
+  <div class="card p-3">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Roll No</th><th>Name</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for student in students %}
+          <tr>
+            <td>{{ student.roll_no }}</td>
+            <td>{{ student.user.full_name }}</td>
+            <td>
+              <select name="status_{{ student.id }}" class="form-select form-select-sm" style="width:140px">
+                <option value="present" {{ 'selected' if existing.get(student.id, 'present') == 'present' }}>Present</option>
+                <option value="absent" {{ 'selected' if existing.get(student.id) == 'absent' }}>Absent</option>
+                <option value="leave" {{ 'selected' if existing.get(student.id) == 'leave' }}>On Leave</option>
+              </select>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-4">No students assigned to you yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if students %}
+    <button type="submit" class="btn btn-primary mt-2" style="max-width:200px">Save Attendance</button>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

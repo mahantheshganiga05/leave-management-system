@@ -1,0 +1,14 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-stack" id="toastStack">
+      {% for category, message in messages %}
+        {% set icon = {'success': 'bi-check-circle-fill', 'danger': 'bi-x-circle-fill', 'error': 'bi-x-circle-fill', 'warning': 'bi-exclamation-triangle-fill', 'info': 'bi-info-circle-fill'} %}
+        <div class="app-toast app-toast-{{ 'danger' if category == 'error' else category }}" role="alert">
+          <i class="bi {{ icon.get(category, 'bi-info-circle-fill') }} app-toast-icon"></i>
+          <span class="app-toast-message">{{ message }}</span>
+          <button type="button" class="app-toast-close" aria-label="Close">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Holidays{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-1"></i>Add Holiday</h6>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="mb-3">{{ form.name.label(class="form-label") }}{{ form.name(class="form-control") }}</div>
+        <div class="mb-3">{{ form.date.label(class="form-label") }}{{ form.date(class="form-control", type="date") }}</div>
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Holiday Calendar</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Name</th><th>Date</th><th></th></tr></thead>
+          <tbody>
+          {% for h in holidays %}
+            <tr>
+              <td>{{ h.name }}</td>
+              <td>{{ h.date.strftime('%d %b %Y (%A)') }}</td>
+              <td class="text-end">
+                <form method="POST" action="{{ url_for('admin.delete_holiday', holiday_id=h.id) }}"
+                      data-confirm="This will remove the holiday from the calendar." data-confirm-title="Remove Holiday?">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-center text-muted py-4">No holidays added yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

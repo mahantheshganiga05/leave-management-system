@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}My Attendance{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">My Attendance</h4>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for r in records %}
+        <tr>
+          <td>{{ r.date.strftime('%d %b %Y') }}</td>
+          <td>
+            {% if r.status == 'present' %}<span class="badge bg-success">Present</span>
+            {% elif r.status == 'absent' %}<span class="badge bg-danger">Absent</span>
+            {% else %}<span class="badge bg-info">On Leave</span>{% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="2" class="text-center text-muted py-4">No attendance records yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

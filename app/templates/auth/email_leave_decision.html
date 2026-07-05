@@ -1,0 +1,61 @@
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 560px; margin: auto; background:#f5f6fb; padding: 24px;">
+  <div style="background:#ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,.08);">
+
+    <div style="background: {{ 'linear-gradient(135deg,#22c55e,#15803d)' if decision == 'Approved' else 'linear-gradient(135deg,#f43f5e,#be123c)' }}; padding: 24px 28px;">
+      <p style="color:#ffffffcc; margin:0; font-size:13px; letter-spacing:.5px; text-transform:uppercase;">Student Leave Management System</p>
+      <h2 style="color:#ffffff; margin:6px 0 0; font-size:20px;">Leave Request {{ decision }}</h2>
+    </div>
+
+    <div style="padding: 28px;">
+      <p style="margin:0 0 16px; color:#111827; font-size:15px;">
+        Dear <strong>{{ leave.student.user.full_name }}</strong>,
+      </p>
+      <p style="margin:0 0 20px; color:#374151; font-size:14px; line-height:1.6;">
+        Your leave request has been
+        <strong style="color:{{ '#15803d' if decision == 'Approved' else '#be123c' }};">{{ decision|lower }}</strong>
+        by {{ 'your Faculty Advisor' if leave.faculty_id and not leave.admin_id else 'the Administrator' }}.
+      </p>
+
+      <table style="width:100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; width:42%; border-bottom:1px solid #f0f0f3;">Leave Status</td>
+          <td style="padding:10px 12px; font-weight:700; border-bottom:1px solid #f0f0f3; color:{{ '#15803d' if decision == 'Approved' else '#be123c' }};">{{ decision }}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; border-bottom:1px solid #f0f0f3;">Decided By</td>
+          <td style="padding:10px 12px; color:#111827; font-weight:600; border-bottom:1px solid #f0f0f3;">{{ decided_by_name }}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; border-bottom:1px solid #f0f0f3;">Leave Type</td>
+          <td style="padding:10px 12px; color:#111827; font-weight:600; border-bottom:1px solid #f0f0f3;">{{ leave.leave_type }}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; border-bottom:1px solid #f0f0f3;">Leave Start Date</td>
+          <td style="padding:10px 12px; color:#111827; font-weight:600; border-bottom:1px solid #f0f0f3;">{{ leave.from_date.strftime('%d %b %Y') }}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; border-bottom:1px solid #f0f0f3;">Leave End Date</td>
+          <td style="padding:10px 12px; color:#111827; font-weight:600; border-bottom:1px solid #f0f0f3;">{{ leave.to_date.strftime('%d %b %Y') }}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; {{ '' if (leave.admin_remarks or leave.faculty_remarks) else '' }}">Number of Days</td>
+          <td style="padding:10px 12px; color:#111827; font-weight:600;">{{ leave.number_of_days() }}</td>
+        </tr>
+        {% if leave.admin_remarks or leave.faculty_remarks %}
+        <tr>
+          <td style="padding:10px 12px; background:#f9fafb; color:#6b7280; vertical-align:top; border-top:1px solid #f0f0f3;">Remarks</td>
+          <td style="padding:10px 12px; color:#111827; border-top:1px solid #f0f0f3;">{{ leave.admin_remarks or leave.faculty_remarks }}</td>
+        </tr>
+        {% endif %}
+      </table>
+
+      <div style="text-align:center; margin: 26px 0 10px;">
+        <a href="{{ url_for('auth.login', _external=True) }}"
+           style="background: linear-gradient(135deg,#4f46e5,#7c3aed); color:#ffffff; text-decoration:none; padding: 12px 32px; border-radius: 8px; font-weight:600; font-size:14px; display:inline-block;">
+          Login to View Details
+        </a>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center; color:#9ca3af; font-size:11px; margin-top:16px;">Student Leave Management System</p>
+</div>

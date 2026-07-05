@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Students{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-1"></i>Create Student</h6>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        {% for field in [form.full_name, form.username, form.email, form.phone, form.roll_no] %}
+        <div class="mb-3">
+          {{ field.label(class="form-label") }}
+          {{ field(class="form-control" + (" is-invalid" if field.errors else "")) }}
+          {% for e in field.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+        <div class="mb-3">{{ form.department_id.label(class="form-label") }}{{ form.department_id(class="form-select") }}</div>
+        <div class="mb-3">{{ form.course_id.label(class="form-label") }}{{ form.course_id(class="form-select") }}</div>
+        <div class="mb-3">{{ form.semester.label(class="form-label") }}{{ form.semester(class="form-control") }}</div>
+        <div class="mb-3">{{ form.faculty_advisor_id.label(class="form-label") }}{{ form.faculty_advisor_id(class="form-select") }}</div>
+        <div class="mb-3">{{ form.parent_id.label(class="form-label") }}{{ form.parent_id(class="form-select") }}</div>
+
+        <hr class="my-3">
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }}
+          <div class="position-relative">
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="newPasswordField") }}
+            <button type="button" class="btn btn-sm position-absolute" style="right:2px; top:2px; border:none;" onclick="toggleNewPassword()">
+              <i class="bi bi-eye" id="newPasswordIcon"></i>
+            </button>
+          </div>
+          {% for e in form.password.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          <div class="form-text">Set the login password yourself and share it with the student directly.</div>
+        </div>
+        <div class="mb-3">
+          {{ form.confirm_password.label(class="form-label") }}
+          {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else "")) }}
+          {% for e in form.confirm_password.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">All Students</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Name</th><th>Roll No</th><th>Dept / Course</th><th>Advisor</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+          {% for s in students %}
+            <tr>
+              <td>{{ s.user.full_name }}<br><small class="text-muted">{{ s.user.email }}</small></td>
+              <td>{{ s.roll_no }}</td>
+              <td>{{ s.department.code }} / {{ s.course.code }} (Sem {{ s.semester }})</td>
+              <td>{{ s.faculty_advisor.user.full_name if s.faculty_advisor else '—' }}</td>
+              <td>
+                {% if s.user.is_active_account %}<span class="badge bg-success">Active</span>
+                {% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-1 justify-content-end">
+                  <form method="POST" action="{{ url_for('admin.toggle_student', student_id=s.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-outline-secondary">Toggle</button>
+                  </form>
+                  <form method="POST" action="{{ url_for('admin.delete_student', student_id=s.id) }}"
+                        data-confirm="This permanently deletes {{ s.user.full_name }}'s account, along with their leave requests, attendance records, and uploaded documents. This cannot be undone."
+                        data-confirm-title="Delete Student Account?">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-center text-muted py-4">No students yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'admin/_credentials_modal.html' %}
+<script>
+  function toggleNewPassword() {
+    const field = document.getElementById('newPasswordField');
+    const icon = document.getElementById('newPasswordIcon');
+    if (field.type === 'password') { field.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+    else { field.type = 'password'; icon.className = 'bi bi-eye'; }
+  }
+</script>
+{% endblock %}

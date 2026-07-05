@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Academic Calendar{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Academic Calendar</h4>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Add Academic Year</h6>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.year_label.label(class="form-label") }}
+          {{ form.year_label(class="form-control", placeholder="2025-2026") }}
+        </div>
+        <div class="mb-3">
+          {{ form.start_date.label(class="form-label") }}
+          {{ form.start_date(class="form-control", type="date") }}
+        </div>
+        <div class="mb-3">
+          {{ form.end_date.label(class="form-label") }}
+          {{ form.end_date(class="form-control", type="date") }}
+        </div>
+        <div class="form-check mb-3">
+          {{ form.is_current(class="form-check-input") }}
+          {{ form.is_current.label(class="form-check-label") }}
+        </div>
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">All Academic Years</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Year</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for ay in academic_years %}
+            <tr>
+              <td>{{ ay.year_label }}</td>
+              <td>{{ ay.start_date.strftime('%d %b %Y') }}</td>
+              <td>{{ ay.end_date.strftime('%d %b %Y') }}</td>
+              <td>{% if ay.is_current %}<span class="badge bg-success">Current</span>{% else %}<span class="badge bg-secondary">Archived</span>{% endif %}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No academic years configured yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

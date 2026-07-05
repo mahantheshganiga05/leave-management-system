@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Apply for Leave{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Apply for Leave</h4>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.leave_type.label(class="form-label") }}
+          {{ form.leave_type(class="form-select") }}
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            {{ form.from_date.label(class="form-label") }}
+            {{ form.from_date(class="form-control" + (" is-invalid" if form.from_date.errors else ""), type="date") }}
+            {% for e in form.from_date.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6 mb-3">
+            {{ form.to_date.label(class="form-label") }}
+            {{ form.to_date(class="form-control" + (" is-invalid" if form.to_date.errors else ""), type="date") }}
+            {% for e in form.to_date.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.reason.label(class="form-label") }}
+          {{ form.reason(class="form-control" + (" is-invalid" if form.reason.errors else ""), rows=4) }}
+          {% for e in form.reason.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.document.label(class="form-label") }}
+          {{ form.document(class="form-control" + (" is-invalid" if form.document.errors else "")) }}
+          {% for e in form.document.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          <div class="form-text">Required for Sick Leave / Medical Leave. Max 5 MB (PDF, PNG, JPG).</div>
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card p-4 bg-body-tertiary">
+      <h6 class="fw-bold mb-2"><i class="bi bi-info-circle"></i> Leave Policy Reminders</h6>
+      <ul class="small mb-0 ps-3">
+        <li>You cannot apply for leave on a past date.</li>
+        <li>Overlapping leave requests are not allowed.</li>
+        <li>A single request cannot exceed 15 days.</li>
+        <li>Sick Leave and Medical Leave require a certificate upload.</li>
+        <li>Requests go to your Faculty Advisor first, then Admin for final approval.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

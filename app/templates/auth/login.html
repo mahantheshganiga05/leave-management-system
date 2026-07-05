@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+<style>
+  .login-bg {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #4338ca 0%, #4f46e5 45%, #7c3aed 100%);
+  }
+  .login-bg::before, .login-bg::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: .35;
+    animation: floatBlob 12s ease-in-out infinite;
+  }
+  .login-bg::before {
+    width: 380px; height: 380px;
+    background: #a78bfa;
+    top: -120px; left: -100px;
+  }
+  .login-bg::after {
+    width: 420px; height: 420px;
+    background: #22d3ee;
+    bottom: -140px; right: -120px;
+    animation-delay: 3s;
+  }
+  @keyframes floatBlob {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(30px,-20px) scale(1.08); }
+  }
+
+  .login-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 2.5rem 2.25rem;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    color: #ffffff;
+    animation: cardEnter .5s ease-out;
+  }
+  @keyframes cardEnter {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-logo {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.8rem;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .login-card .form-label { color: rgba(255,255,255,0.9); font-size: .85rem; font-weight: 500; }
+  .login-card .form-control {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    border-radius: 10px;
+    padding: .65rem .9rem;
+  }
+  .login-card .form-control::placeholder { color: rgba(255,255,255,0.55); }
+  .login-card .form-control:focus {
+    background: rgba(255,255,255,0.18);
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.15);
+    color: #fff;
+  }
+  .login-card .form-check-input { background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+  .login-card .form-check-input:checked { background-color: #fff; border-color: #fff; }
+  .login-card .form-check-label { color: rgba(255,255,255,0.85); font-size: .88rem; }
+  .login-card .invalid-feedback { color: #fecdd3; }
+
+  .password-toggle-wrap { position: relative; }
+  .password-toggle-btn {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer;
+    padding: 4px;
+  }
+  .password-toggle-btn:hover { color: #fff; }
+
+  .btn-login {
+    background: #ffffff;
+    color: #4338ca;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    border: none;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-login:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.25); color: #4338ca; }
+  .btn-login:disabled { opacity: .8; }
+
+  .login-card a { color: #e0e7ff; }
+  .login-card a:hover { color: #fff; }
+
+  .spinner-border-sm-custom {
+    width: 1rem; height: 1rem; border-width: 2px;
+  }
+</style>
+{% endblock %}
+
+{% block guest_content %}
+<div class="login-bg">
+  <div class="login-card">
+    <div class="text-center mb-4">
+      <div class="login-logo">
+        <i class="bi bi-mortarboard-fill"></i>
+      </div>
+      <h4 class="fw-bold mb-1">Student Leave Management</h4>
+      <p class="mb-0" style="color: rgba(255,255,255,0.75); font-size:.88rem;">Sign in to continue to your portal</p>
+    </div>
+
+    <form method="POST" novalidate id="loginForm">
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        {{ form.username.label(class="form-label") }}
+        <div class="position-relative">
+          <span class="position-absolute" style="left:12px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.55);">
+            <i class="bi bi-person-fill"></i>
+          </span>
+          {{ form.username(class="form-control ps-4" + (" is-invalid" if form.username.errors else ""),
+                            style="padding-left:2.2rem;", placeholder="Username or Email", autofocus=true) }}
+        </div>
+        {% for error in form.username.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="mb-2">
+        {{ form.password.label(class="form-label") }}
+        <div class="password-toggle-wrap">
+          {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                            placeholder="Password", id="passwordField") }}
+          <button type="button" class="password-toggle-btn" id="togglePassword" tabindex="-1" aria-label="Show or hide password">
+            <i class="bi bi-eye-fill" id="toggleIcon"></i>
+          </button>
+        </div>
+        {% for error in form.password.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <div class="form-check">
+          {{ form.remember(class="form-check-input") }}
+          {{ form.remember.label(class="form-check-label") }}
+        </div>
+        <a href="{{ url_for('auth.forgot_password') }}" class="small text-decoration-none">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-login w-100" id="loginSubmitBtn">
+        <span id="loginBtnText">Sign In</span>
+        <span id="loginBtnSpinner" class="spinner-border spinner-border-sm-custom ms-2 d-none" role="status" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <p class="text-center mt-4 mb-0" style="color: rgba(255,255,255,0.55); font-size:.75rem;">
+      &copy; {{ current_year if current_year else '' }} Student Leave Management System
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const toggleBtn = document.getElementById('togglePassword');
+    const pwField = document.getElementById('passwordField');
+    const toggleIcon = document.getElementById('toggleIcon');
+    if (toggleBtn && pwField) {
+      toggleBtn.addEventListener('click', function () {
+        const isPassword = pwField.getAttribute('type') === 'password';
+        pwField.setAttribute('type', isPassword ? 'text' : 'password');
+        toggleIcon.className = isPassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill';
+      });
+    }
+
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    const btnText = document.getElementById('loginBtnText');
+    const btnSpinner = document.getElementById('loginBtnSpinner');
+    if (form && submitBtn) {
+      form.addEventListener('submit', function () {
+        if (form.checkValidity()) {
+          submitBtn.disabled = true;
+          btnText.textContent = 'Signing in...';
+          btnSpinner.classList.remove('d-none');
+        }
+      });
+    }
+  })();
+</script>
+{% endblock %}

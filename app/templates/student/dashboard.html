@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Welcome back, {{ current_user.full_name }} 👋</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-indigo d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ total }}</div><div>Total Leaves</div></div>
+      <i class="bi bi-envelope-paper-fill stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-amber d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ pending }}</div><div>Pending</div></div>
+      <i class="bi bi-hourglass-split stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-green d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ approved }}</div><div>Approved</div></div>
+      <i class="bi bi-check-circle-fill stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-sky d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ attendance_pct }}%</div><div>Attendance</div></div>
+      <i class="bi bi-clipboard-data-fill stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-end mb-3">
+  <a href="{{ url_for('student.apply_leave') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Apply for Leave</a>
+</div>
+
+<div class="card p-3">
+  <h6 class="fw-bold mb-3">Recent Leave Requests</h6>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Type</th><th>Dates</th><th>Days</th><th>Status</th><th>Applied On</th></tr></thead>
+      <tbody>
+      {% for lr in leaves %}
+        <tr>
+          <td>{{ lr.leave_type }}</td>
+          <td>{{ lr.from_date.strftime('%d %b') }} - {{ lr.to_date.strftime('%d %b %Y') }}</td>
+          <td>{{ lr.number_of_days() }}</td>
+          <td><span class="badge bg-{{ lr.status_badge_class() }}">{{ lr.status_label() }}</span></td>
+          <td>{{ lr.applied_on.strftime('%d %b %Y') }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No leave requests yet. Apply for your first leave above.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

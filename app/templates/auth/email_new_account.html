@@ -1,0 +1,11 @@
+<div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
+  <h2 style="color:#4f46e5;">Your {{ role }} Account</h2>
+  <p>Hi {{ user.full_name }},</p>
+  <p>An account has been created for you on the Leave Management System.</p>
+  <table style="border-collapse:collapse;margin:16px 0;">
+    <tr><td style="padding:4px 8px;"><strong>Username:</strong></td><td style="padding:4px 8px;">{{ user.username }}</td></tr>
+    <tr><td style="padding:4px 8px;"><strong>Temporary Password:</strong></td><td style="padding:4px 8px;">{{ temp_password }}</td></tr>
+  </table>
+  <p>Please log in and change your password immediately.</p>
+  <p style="color:#888;font-size:12px;">Leave Management System</p>
+</div>

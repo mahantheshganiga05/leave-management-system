@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Welcome back, {{ current_user.full_name }} 👋</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-indigo d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ total_students }}</div><div>Students</div></div>
+      <i class="bi bi-mortarboard-fill stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-sky d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ total_faculty }}</div><div>Faculty</div></div>
+      <i class="bi bi-person-badge-fill stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-amber d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ pending_leaves }}</div><div>Pending Leaves</div></div>
+      <i class="bi bi-hourglass-split stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card bg-grad-green d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ approved_leaves }}</div><div>Approved Leaves</div></div>
+      <i class="bi bi-check-circle-fill stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Leave Requests by Type</h6>
+      <canvas id="typeChart" height="200"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Monthly Leave Trend</h6>
+      <canvas id="trendChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3">
+  <h6 class="fw-bold mb-3">Recent Leave Requests</h6>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Student</th><th>Type</th><th>Dates</th><th>Status</th><th>Applied On</th></tr></thead>
+      <tbody>
+      {% for lr in recent_leaves %}
+        <tr>
+          <td>{{ lr.student.user.full_name }} <span class="text-muted small">({{ lr.student.roll_no }})</span></td>
+          <td>{{ lr.leave_type }}</td>
+          <td>{{ lr.from_date.strftime('%d %b') }} - {{ lr.to_date.strftime('%d %b') }}</td>
+          <td><span class="badge bg-{{ lr.status_badge_class() }}">{{ lr.status_label() }}</span></td>
+          <td>{{ lr.applied_on.strftime('%d %b %Y') }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No leave requests yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const typeLabels = {{ type_counts|map(attribute=0)|list|tojson }};
+const typeData = {{ type_counts|map(attribute=1)|list|tojson }};
+new Chart(document.getElementById('typeChart'), {
+  type: 'doughnut',
+  data: { labels: typeLabels, datasets: [{ data: typeData,
+    backgroundColor: ['#4f46e5','#0ea5e9','#22c55e','#f59e0b','#f43f5e','#a855f7','#14b8a6','#eab308','#64748b'] }] },
+  options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
+});
+
+const trendLabels = {{ monthly_counts|map(attribute=0)|list|tojson }};
+const trendData = {{ monthly_counts|map(attribute=1)|list|tojson }};
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: { labels: trendLabels, datasets: [{ label: 'Leave Requests', data: trendData,
+    borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.15)', fill: true, tension: 0.35 }] },
+  options: { plugins: { legend: { display: false } } }
+});
+</script>
+{% endblock %}

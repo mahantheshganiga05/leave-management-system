@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Leave Management System{% endblock %}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<nav class="navbar navbar-expand-lg app-navbar">
+  <div class="container-fluid">
+    <button class="btn btn-sm btn-outline-secondary d-lg-none me-2" id="sidebarToggle"><i class="bi bi-list"></i></button>
+    <a class="navbar-brand fw-bold" href="{{ url_for('main.dashboard') }}"><i class="bi bi-calendar2-check-fill text-primary"></i> LeaveMS</a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <button class="btn btn-sm btn-outline-secondary" id="themeToggle" title="Toggle dark mode">
+        <i class="bi bi-moon-stars-fill"></i>
+      </button>
+      <a href="{{ url_for('main.notifications') }}" class="position-relative text-decoration-none text-body">
+        <i class="bi bi-bell-fill fs-5"></i>
+        {% if unread_notifications and unread_notifications > 0 %}
+        <span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle">{{ unread_notifications }}</span>
+        {% endif %}
+      </a>
+      <div class="dropdown">
+        <a class="d-flex align-items-center text-decoration-none text-body dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <span class="avatar-circle me-2">{{ current_user.full_name[0]|upper }}</span>
+          <span class="d-none d-md-inline">{{ current_user.full_name }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><span class="dropdown-item-text text-muted small">{{ current_user.role_name|title }}</span></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{{ url_for('auth.change_password') }}"><i class="bi bi-key me-2"></i>Change Password</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="app-shell">
+  <aside class="app-sidebar" id="appSidebar">
+    <ul class="nav flex-column">
+      {% set role = current_user.role_name %}
+      {% if role == 'admin' %}
+        {% include 'admin/_sidebar.html' %}
+      {% elif role == 'faculty' %}
+        {% include 'faculty/_sidebar.html' %}
+      {% elif role == 'student' %}
+        {% include 'student/_sidebar.html' %}
+      {% elif role == 'parent' %}
+        {% include 'parent/_sidebar.html' %}
+      {% endif %}
+    </ul>
+  </aside>
+
+  <main class="app-content">
+    {% include '_flashes.html' %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}
+  {% include '_flashes.html' %}
+  {% block guest_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

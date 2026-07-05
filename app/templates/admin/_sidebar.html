@@ -1,0 +1,12 @@
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.student_list' }}" href="{{ url_for('admin.student_list') }}"><i class="bi bi-mortarboard"></i> Students</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.faculty_list' }}" href="{{ url_for('admin.faculty_list') }}"><i class="bi bi-person-badge"></i> Faculty</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.parent_list' }}" href="{{ url_for('admin.parent_list') }}"><i class="bi bi-people"></i> Parents</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.departments' }}" href="{{ url_for('admin.departments') }}"><i class="bi bi-diagram-3"></i> Departments</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.courses' }}" href="{{ url_for('admin.courses') }}"><i class="bi bi-journal-bookmark"></i> Courses</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.leave_requests' }}" href="{{ url_for('admin.leave_requests') }}"><i class="bi bi-envelope-paper"></i> Leave Requests</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.attendance_report' }}" href="{{ url_for('admin.attendance_report') }}"><i class="bi bi-clipboard-data"></i> Attendance Report</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.holidays' }}" href="{{ url_for('admin.holidays') }}"><i class="bi bi-calendar-event"></i> Holidays</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.academic_years' }}" href="{{ url_for('admin.academic_years') }}"><i class="bi bi-calendar3"></i> Academic Calendar</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.user_management' }}" href="{{ url_for('admin.user_management') }}"><i class="bi bi-shield-lock"></i> User Management</a></li>
+<li class="nav-item"><a class="nav-link {{ 'active' if request.endpoint == 'admin.audit_logs' }}" href="{{ url_for('admin.audit_logs') }}"><i class="bi bi-journal-text"></i> Audit Logs</a></li>

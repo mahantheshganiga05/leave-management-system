@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}{{ child.user.full_name }} - Leave Status{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">{{ child.user.full_name }}'s Leave Status</h4>
+  <a href="{{ url_for('parent.dashboard') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="card p-3 mb-3">
+  <span class="text-muted small">{{ child.roll_no }} &middot; {{ child.course.name }} &middot; Semester {{ child.semester }}</span>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Type</th><th>Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Applied On</th></tr></thead>
+      <tbody>
+      {% for lr in leaves %}
+        <tr>
+          <td>{{ lr.leave_type }}</td>
+          <td>{{ lr.from_date.strftime('%d %b') }} - {{ lr.to_date.strftime('%d %b %Y') }}</td>
+          <td>{{ lr.number_of_days() }}</td>
+          <td class="small">{{ lr.reason }}</td>
+          <td><span class="badge bg-{{ lr.status_badge_class() }}">{{ lr.status_label() }}</span></td>
+          <td class="small">{{ lr.applied_on.strftime('%d %b %Y') }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No leave requests found for this student.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

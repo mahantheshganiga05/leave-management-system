@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Welcome - Leave Management System{% endblock %}
+{% block guest_content %}
+<div class="auth-wrapper">
+  <div class="text-center text-white">
+    <i class="bi bi-calendar2-check-fill" style="font-size:4rem;"></i>
+    <h1 class="fw-bold mt-3">College Leave Management System</h1>
+    <p class="lead mb-4">Admin &bull; Faculty &bull; Student &bull; Parent Portals</p>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-light btn-lg px-5 fw-semibold">Login to Continue</a>
+  </div>
+</div>
+{% endblock %}

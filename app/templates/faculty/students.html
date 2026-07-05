@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}My Students{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">My Students</h4>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Roll No</th><th>Name</th><th>Course</th><th>Semester</th><th>Email</th><th>Phone</th></tr></thead>
+      <tbody>
+      {% for student in students %}
+        <tr>
+          <td>{{ student.roll_no }}</td>
+          <td>{{ student.user.full_name }}</td>
+          <td>{{ student.course.name }}</td>
+          <td>{{ student.semester }}</td>
+          <td>{{ student.user.email }}</td>
+          <td>{{ student.user.phone or '—' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No students assigned to you yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

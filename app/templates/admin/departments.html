@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Departments{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-1"></i>Add Department</h6>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+          {% for e in form.name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.code.label(class="form-label") }}
+          {{ form.code(class="form-control" + (" is-invalid" if form.code.errors else "")) }}
+          {% for e in form.code.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">All Departments</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Name</th><th>Code</th><th>Courses</th><th>Students</th><th></th></tr></thead>
+          <tbody>
+          {% for d in departments %}
+            <tr>
+              <td>{{ d.name }}</td>
+              <td><span class="badge bg-secondary">{{ d.code }}</span></td>
+              <td>{{ d.courses|length }}</td>
+              <td>{{ d.students|length }}</td>
+              <td class="text-end">
+                <form method="POST" action="{{ url_for('admin.delete_department', dept_id=d.id) }}" data-confirm="This will permanently delete the department. This cannot be undone." data-confirm-title="Delete Department?">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No departments yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

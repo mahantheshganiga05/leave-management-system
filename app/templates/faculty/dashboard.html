@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Faculty Dashboard{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Welcome back, {{ current_user.full_name }} 👋</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4 col-6">
+    <div class="stat-card bg-grad-indigo d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ total_advisees }}</div><div>My Students</div></div>
+      <i class="bi bi-mortarboard-fill stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="stat-card bg-grad-amber d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ pending_count }}</div><div>Pending Leave Requests</div></div>
+      <i class="bi bi-hourglass-split stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="stat-card bg-grad-sky d-flex justify-content-between align-items-center">
+      <div><div class="stat-value">{{ faculty.designation }}</div><div>{{ faculty.department.name }}</div></div>
+      <i class="bi bi-person-badge-fill stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="fw-bold mb-0">Recent Leave Requests from My Students</h6>
+    <a href="{{ url_for('faculty.leave_requests') }}" class="btn btn-sm btn-outline-primary">View All</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Student</th><th>Type</th><th>Dates</th><th>Status</th><th>Applied On</th></tr></thead>
+      <tbody>
+      {% for lr in recent_leaves %}
+        <tr>
+          <td>{{ lr.student.user.full_name }} <span class="text-muted small">({{ lr.student.roll_no }})</span></td>
+          <td>{{ lr.leave_type }}</td>
+          <td>{{ lr.from_date.strftime('%d %b') }} - {{ lr.to_date.strftime('%d %b') }}</td>
+          <td><span class="badge bg-{{ lr.status_badge_class() }}">{{ lr.status_label() }}</span></td>
+          <td>{{ lr.applied_on.strftime('%d %b %Y') }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No leave requests yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

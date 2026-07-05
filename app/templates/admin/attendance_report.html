@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Attendance Report{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0">Attendance Report</h4>
+  <form method="GET" class="d-flex gap-2">
+    <select name="department_id" class="form-select form-select-sm" onchange="this.form.submit()">
+      <option value="">All Departments</option>
+      {% for d in departments %}
+      <option value="{{ d.id }}" {{ 'selected' if selected_dept == d.id }}>{{ d.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Student</th><th>Roll No</th><th>Total Days</th><th>Present</th><th>Absent</th><th>On Leave</th><th>%</th></tr></thead>
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>{{ row.student.user.full_name }}</td>
+          <td>{{ row.student.roll_no }}</td>
+          <td>{{ row.total }}</td>
+          <td>{{ row.present }}</td>
+          <td>{{ row.absent }}</td>
+          <td>{{ row.on_leave }}</td>
+          <td>
+            <div class="progress" style="height:18px;">
+              <div class="progress-bar {{ 'bg-success' if row.percentage >= 75 else 'bg-warning' }}" style="width:{{ row.percentage }}%;">{{ row.percentage }}%</div>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No attendance data yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

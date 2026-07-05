@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Leave History{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">Leave History</h4>
+  <a href="{{ url_for('student.apply_leave') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Apply for Leave</a>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Type</th><th>Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Remarks</th><th>Applied On</th><th></th></tr></thead>
+      <tbody>
+      {% for lr in leaves %}
+        <tr>
+          <td>{{ lr.leave_type }}</td>
+          <td>{{ lr.from_date.strftime('%d %b') }} - {{ lr.to_date.strftime('%d %b %Y') }}</td>
+          <td>{{ lr.number_of_days() }}</td>
+          <td class="small">{{ lr.reason }}
+            {% for doc in lr.documents %}
+              <br><a href="{{ url_for('student.download_document', doc_id=doc.id) }}" class="small"><i class="bi bi-paperclip"></i> {{ doc.filename }}</a>
+            {% endfor %}
+          </td>
+          <td><span class="badge bg-{{ lr.status_badge_class() }}">{{ lr.status_label() }}</span></td>
+          <td class="small text-muted">{{ lr.admin_remarks or lr.faculty_remarks or '—' }}</td>
+          <td class="small">{{ lr.applied_on.strftime('%d %b %Y') }}</td>
+          <td>
+            {% if lr.status in ('pending', 'faculty_approved') %}
+            <form method="POST" action="{{ url_for('student.cancel_leave', leave_id=lr.id) }}"
+                  data-confirm="This will cancel your leave request. You can apply again later if needed."
+                  data-confirm-title="Cancel Leave Request?">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-outline-danger">Cancel</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">You haven't applied for any leave yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

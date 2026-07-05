@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Parents{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-1"></i>Create Parent</h6>
+      <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        {% for field in [form.full_name, form.username, form.email, form.phone, form.occupation] %}
+        <div class="mb-3">
+          {{ field.label(class="form-label") }}
+          {{ field(class="form-control" + (" is-invalid" if field.errors else "")) }}
+          {% for e in field.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+
+        <hr class="my-3">
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }}
+          <div class="position-relative">
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="newPasswordField") }}
+            <button type="button" class="btn btn-sm position-absolute" style="right:2px; top:2px; border:none;" onclick="toggleNewPassword()">
+              <i class="bi bi-eye" id="newPasswordIcon"></i>
+            </button>
+          </div>
+          {% for e in form.password.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          <div class="form-text">Set the login password yourself and share it with the parent directly.</div>
+        </div>
+        <div class="mb-3">
+          {{ form.confirm_password.label(class="form-label") }}
+          {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else "")) }}
+          {% for e in form.confirm_password.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">All Parents</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Name</th><th>Email</th><th>Children</th></tr></thead>
+          <tbody>
+          {% for p in parents %}
+            <tr>
+              <td>{{ p.user.full_name }}</td>
+              <td>{{ p.user.email }}</td>
+              <td>
+                {% for c in p.children %}<span class="badge bg-light text-dark border">{{ c.user.full_name }}</span>{% else %}<span class="text-muted">None linked</span>{% endfor %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-center text-muted py-4">No parents yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'admin/_credentials_modal.html' %}
+<script>
+  function toggleNewPassword() {
+    const field = document.getElementById('newPasswordField');
+    const icon = document.getElementById('newPasswordIcon');
+    if (field.type === 'password') { field.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+    else { field.type = 'password'; icon.className = 'bi bi-eye'; }
+  }
+</script>
+{% endblock %}

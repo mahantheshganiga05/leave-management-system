@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Server Error{% endblock %}
+{% block guest_content %}
+<div class="auth-wrapper"><div class="auth-card text-center">
+  <i class="bi bi-bug-fill text-danger" style="font-size:3rem;"></i>
+  <h2 class="mt-3">500 - Server Error</h2>
+  <p class="text-muted">Something went wrong on our end. Please try again shortly.</p>
+  <a href="{{ url_for('main.index') }}" class="btn btn-primary">Go Home</a>
+</div></div>
+{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <i class="bi bi-bug-fill text-danger" style="font-size:3rem;"></i>
+  <h2 class="mt-3">500 - Server Error</h2>
+  <p class="text-muted">Something went wrong on our end. Please try again shortly.</p>
+  <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+</div>
+{% endblock %}

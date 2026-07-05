@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block title %}Leave Requests{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <h4 class="fw-bold mb-0">Leave Requests</h4>
+  <div class="btn-group">
+    <a href="{{ url_for('faculty.leave_requests', status='pending') }}" class="btn btn-sm btn-outline-primary {{ 'active' if status_filter == 'pending' }}">Pending</a>
+    <a href="{{ url_for('faculty.leave_requests', status='all') }}" class="btn btn-sm btn-outline-primary {{ 'active' if status_filter == 'all' }}">All</a>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <div class="row g-2">
+    <div class="col-md-6">
+      <div class="position-relative">
+        <i class="bi bi-search position-absolute" style="left:12px; top:50%; transform:translateY(-50%); color:#9ca3af;"></i>
+        <input type="text" id="leaveSearchInput" class="form-control ps-4" style="padding-left:2.1rem;"
+               placeholder="Search by student name, roll no, or leave type...">
+      </div>
+    </div>
+    <div class="col-md-4">
+      <select id="leaveTypeFilter" class="form-select">
+        <option value="">All Leave Types</option>
+        {% for t in ['Sick Leave','Casual Leave','Medical Leave','Emergency Leave','Sports Leave','Industrial Visit','Internship Leave','On Duty Leave','Personal Leave'] %}
+          <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table align-middle" id="leaveRequestsTable">
+      <thead><tr><th>Student</th><th>Type</th><th>Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for lr in leaves %}
+        <tr data-student="{{ lr.student.user.full_name|lower }} {{ lr.student.roll_no|lower }}" data-type="{{ lr.leave_type }}">
+          <td>
+            <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#studentModal{{ lr.student.id }}">
+              {{ lr.student.user.full_name }} <span class="text-muted small">({{ lr.student.roll_no }})</span>
+            </a>
+          </td>
+          <td>{{ lr.leave_type }}</td>
+          <td>{{ lr.from_date.strftime('%d %b') }} - {{ lr.to_date.strftime('%d %b %Y') }}</td>
+          <td>{{ lr.number_of_days() }}</td>
+          <td class="small">{{ lr.reason }}
+            {% for doc in lr.documents %}
+              <br><a href="{{ url_for('student.download_document', doc_id=doc.id) }}" class="small"><i class="bi bi-paperclip"></i> {{ doc.filename }}</a>
+            {% endfor %}
+          </td>
+          <td><span class="badge bg-{{ lr.status_badge_class() }}">{{ lr.status_label() }}</span></td>
+          <td>
+            {% if lr.status == 'pending' %}
+            <div class="d-flex gap-1">
+              <form method="POST" action="{{ url_for('faculty.decide_leave', leave_id=lr.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="approve">
+                <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
+              </form>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ lr.id }}">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            <div class="modal fade" id="rejectModal{{ lr.id }}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="POST" action="{{ url_for('faculty.decide_leave', leave_id=lr.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="reject">
+                    <div class="modal-header"><h6 class="modal-title">Reject Leave Request</h6>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                      <label class="form-label">Remarks</label>
+                      <textarea name="remarks" class="form-control" rows="3" placeholder="Reason for rejection"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-danger">Reject</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% else %}
+              <span class="text-muted small">
+                {{ lr.faculty_remarks or '—' }}
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+
+        <!-- Student detail popup -->
+        <div class="modal fade" id="studentModal{{ lr.student.id }}" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title"><i class="bi bi-person-badge-fill me-1"></i> Student Details</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <table class="table table-sm mb-0">
+                  <tr><th style="width:140px">Name</th><td>{{ lr.student.user.full_name }}</td></tr>
+                  <tr><th>Roll No</th><td>{{ lr.student.roll_no }}</td></tr>
+                  <tr><th>Department</th><td>{{ lr.student.department.name }}</td></tr>
+                  <tr><th>Course</th><td>{{ lr.student.course.name }}</td></tr>
+                  <tr><th>Semester</th><td>{{ lr.student.semester }}</td></tr>
+                  <tr><th>Email</th><td>{{ lr.student.user.email }}</td></tr>
+                  <tr><th>Phone</th><td>{{ lr.student.user.phone or '—' }}</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No leave requests found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p id="noResultsMsg" class="text-center text-muted py-4 d-none">No leave requests match your search.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const searchInput = document.getElementById('leaveSearchInput');
+    const typeFilter = document.getElementById('leaveTypeFilter');
+    const rows = Array.from(document.querySelectorAll('#leaveRequestsTable tbody tr[data-student]'));
+    const noResultsMsg = document.getElementById('noResultsMsg');
+
+    function applyFilters() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      const type = typeFilter.value;
+      let visibleCount = 0;
+
+      rows.forEach(function (row) {
+        const matchesSearch = !query || row.dataset.student.includes(query) || row.dataset.type.toLowerCase().includes(query);
+        const matchesType = !type || row.dataset.type === type;
+        const show = matchesSearch && matchesType;
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+
+      noResultsMsg.classList.toggle('d-none', visibleCount > 0 || rows.length === 0);
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (typeFilter) typeFilter.addEventListener('change', applyFilters);
+  })();
+</script>
+{% endblock %}
