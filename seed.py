@@ -49,9 +49,9 @@ def create_user(username, email, full_name, role, phone=None):
     db.session.flush()
     return user
 
-
-def run_seed():
-    app = create_app('development')
+def run_seed(app=None):
+    if app is None:
+        app = create_app('development')
     with app.app_context():
         print("Seeding database...")
 
