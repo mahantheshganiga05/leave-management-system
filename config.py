@@ -9,11 +9,20 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
 
-    # ✅ IMPORTANT FIX (Render PostgreSQL)
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    # ✅ IMPORTANT FIX (Render PostgreSQL) — psycopg3 dialect force madoke
+    _raw_db_url = os.environ.get(
+        'DATABASE_URL',
+        'mysql+pymysql://root:@localhost:3306/leave_management'
+    )
+    if _raw_db_url.startswith('postgres://'):
+        _raw_db_url = _raw_db_url.replace('postgres://', 'postgresql://', 1)
+    if _raw_db_url.startswith('postgresql://') and '+psycopg' not in _raw_db_url:
+        _raw_db_url = _raw_db_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+
+    SQLALCHEMY_DATABASE_URI = _raw_db_url
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True, "pool_recycle": 300}
 
     # Uploads
     UPLOAD_FOLDER = os.path.join(basedir, 'app', 'uploads', 'medical_certificates')
