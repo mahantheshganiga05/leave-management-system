@@ -6,8 +6,7 @@ from app.models import (
     LeaveRequest, LeaveDocument, Attendance, Notification, AuditLog,
     Holiday, AcademicYear, Settings
 )
-
-app = create_app(os.environ.get('FLASK_CONFIG', 'development'))
+app = create_app(os.environ.get('FLASK_CONFIG', 'production'))
 
 
 @app.shell_context_processor
