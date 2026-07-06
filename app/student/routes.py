@@ -86,25 +86,38 @@ def apply_leave():
 
         db.session.commit()
 
+        # --- Notification (in-app) : should not block leave submission ---
         if student.faculty_advisor_id:
-            notify(student.faculty_advisor.user_id,
-                   f"{student.user.full_name} applied for {leave.leave_type} "
-                   f"({leave.from_date} to {leave.to_date}).",
-                   link=url_for('faculty.leave_requests'))
-            send_email(
-                'New Leave Request - Student Leave Management System',
-                [student.faculty_advisor.user.email],
-                render_template('auth/email_faculty_new_leave.html', leave=leave, student=student)
-            )
-        send_email('Leave Application Submitted', [student.user.email],
-                   render_template('auth/email_leave_submitted.html', leave=leave))
+            try:
+                notify(student.faculty_advisor.user_id,
+                       f"{student.user.full_name} applied for {leave.leave_type} "
+                       f"({leave.from_date} to {leave.to_date}).",
+                       link=url_for('faculty.leave_requests'))
+            except Exception as e:
+                current_app.logger.error(f"notify() failed for leave {leave.id}: {e}")
+
+        # --- Emails: wrapped so a slow/failing SMTP server can NEVER crash the request ---
+        if student.faculty_advisor_id:
+            try:
+                send_email(
+                    'New Leave Request - Student Leave Management System',
+                    [student.faculty_advisor.user.email],
+                    render_template('auth/email_faculty_new_leave.html', leave=leave, student=student)
+                )
+            except Exception as e:
+                current_app.logger.error(f"Faculty email failed for leave {leave.id}: {e}")
+
+        try:
+            send_email('Leave Application Submitted', [student.user.email],
+                       render_template('auth/email_leave_submitted.html', leave=leave))
+        except Exception as e:
+            current_app.logger.error(f"Student confirmation email failed for leave {leave.id}: {e}")
 
         log_action(f"Student {current_user.username} applied for {leave.leave_type}")
         flash('Leave application submitted successfully.', 'success')
         return redirect(url_for('student.leave_history'))
 
     return render_template('student/apply_leave.html', form=form)
-
 
 @student_bp.route('/leave-history')
 def leave_history():
