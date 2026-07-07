@@ -61,22 +61,18 @@ def log_action(action, user_id=None):
 
 
 def _send_async_email(app, msg):
-    """Runs in a background thread so a slow/hanging SMTP server can NEVER
-    block or crash the request-handling worker."""
     with app.app_context():
         try:
             mail.send(msg)
-            app.logger.info(f"[EMAIL SENT] To: {msg.recipients} | Subject: {msg.subject}")
+            print(f"[EMAIL SENT] To: {msg.recipients} | Subject: {msg.subject}", flush=True)
         except Exception as exc:
-            app.logger.warning(f"[EMAIL FAILED] To: {msg.recipients} | Subject: {msg.subject} | Error: {exc}")
+            print(f"[EMAIL FAILED] To: {msg.recipients} | Subject: {msg.subject} | Error: {exc}", flush=True)
 
 
 def send_email(subject, recipients, body_html):
-    """Queue an email to be sent in the background. Returns immediately —
-    the HTTP request never waits on the SMTP connection."""
     msg = Message(subject=subject, recipients=recipients, html=body_html)
     app = current_app._get_current_object()
     thread = threading.Thread(target=_send_async_email, args=(app, msg))
     thread.daemon = True
     thread.start()
-    current_app.logger.info(f"[EMAIL QUEUED] To: {recipients} | Subject: {subject}")
+    print(f"[EMAIL QUEUED] To: {recipients} | Subject: {subject}", flush=True)
