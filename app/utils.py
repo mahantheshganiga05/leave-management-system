@@ -7,9 +7,16 @@ from flask_login import current_user
 from app.extensions import db
 from app.models import Notification, AuditLog
 
-import resend
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
-resend.api_key = os.environ.get('RESEND_API_KEY')
+_brevo_config = sib_api_v3_sdk.Configuration()
+_brevo_config.api_key['api-key'] = os.environ.get('BREVO_API_KEY')
+
+# The sender email MUST be the one you verified in Brevo's
+# Settings -> Senders, Domains & Dedicated IPs -> Senders tab.
+BREVO_SENDER_EMAIL = os.environ.get('BREVO_SENDER_EMAIL', 'mahantheshganiga05@gmail.com')
+BREVO_SENDER_NAME = 'Leave Management System'
 
 
 def role_required(*roles):
@@ -64,26 +71,32 @@ def log_action(action, user_id=None):
 
 
 def _send_async_email(app, subject, recipients, body_html):
-    """Runs in a background thread and uses Resend's HTTPS API (port 443)
+    """Runs in a background thread and uses Brevo's HTTPS API (port 443)
     instead of raw SMTP (port 587), because Render's free tier blocks
     outbound SMTP traffic entirely. This also means the request never
     waits on the email call, so a slow/failing send can never crash or
     hang the request-handling worker."""
     with app.app_context():
         try:
-            resend.Emails.send({
-                "from": "Leave Management System <onboarding@resend.dev>",
-                "to": recipients,
-                "subject": subject,
-                "html": body_html,
-            })
+            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                sib_api_v3_sdk.ApiClient(_brevo_config)
+            )
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                to=[{"email": r} for r in recipients],
+                sender={"name": BREVO_SENDER_NAME, "email": BREVO_SENDER_EMAIL},
+                subject=subject,
+                html_content=body_html,
+            )
+            api_instance.send_transac_email(send_smtp_email)
             print(f"[EMAIL SENT] To: {recipients} | Subject: {subject}", flush=True)
+        except ApiException as exc:
+            print(f"[EMAIL FAILED] To: {recipients} | Subject: {subject} | Error: {exc}", flush=True)
         except Exception as exc:
             print(f"[EMAIL FAILED] To: {recipients} | Subject: {subject} | Error: {exc}", flush=True)
 
 
 def send_email(subject, recipients, body_html):
-    """Queue an email to be sent in the background via Resend's API.
+    """Queue an email to be sent in the background via Brevo's API.
     Returns immediately — the HTTP request never waits on the email send."""
     app = current_app._get_current_object()
     thread = threading.Thread(target=_send_async_email, args=(app, subject, recipients, body_html))
