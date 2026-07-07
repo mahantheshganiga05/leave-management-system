@@ -291,6 +291,24 @@ def parent_list():
                             new_credentials=new_credentials)
 
 
+@admin_bp.route('/parents/<int:parent_id>/delete', methods=['POST'])
+def delete_parent(parent_id):
+    parent = Parent.query.get_or_404(parent_id)
+
+    if parent.children:
+        flash(f'Cannot delete {parent.user.full_name}: they are still linked to '
+              f'{len(parent.children)} student(s). Unlink or delete those students first.',
+              'danger')
+        return redirect(url_for('admin.parent_list'))
+
+    parent_name = parent.user.full_name
+    db.session.delete(parent.user)  # cascades: deletes the Parent profile too
+    db.session.commit()
+    log_action(f"Admin deleted parent account for {parent_name}")
+    flash(f'Parent account for {parent_name} has been permanently deleted.', 'info')
+    return redirect(url_for('admin.parent_list'))
+
+
 # ---------------------------------------------------------------------------
 # Students
 # ---------------------------------------------------------------------------
@@ -363,6 +381,7 @@ def toggle_student(student_id):
 def delete_student(student_id):
     student = Student.query.get_or_404(student_id)
     student_name = student.user.full_name
+    linked_parent_id = student.parent_id  # remember before deleting
 
     # Clean up any uploaded medical certificate files from disk before the
     # database rows are cascade-deleted, so we don't leave orphaned files.
@@ -380,6 +399,19 @@ def delete_student(student_id):
     db.session.delete(user_to_delete)  # cascades: deletes Student, leave_requests,
                                         # leave_documents, attendance, notifications
     db.session.commit()
+
+    # If this student had a linked parent, and that parent has no other
+    # children left, delete the now-orphaned parent account too.
+    if linked_parent_id:
+        remaining_children = Student.query.filter_by(parent_id=linked_parent_id).count()
+        if remaining_children == 0:
+            parent = Parent.query.get(linked_parent_id)
+            if parent:
+                parent_name = parent.user.full_name
+                db.session.delete(parent.user)  # cascades: deletes Parent profile too
+                db.session.commit()
+                log_action(f"Auto-deleted orphaned parent account for {parent_name}")
+
     log_action(f"Admin deleted student account for {student_name}")
     flash(f'Student account for {student_name} has been permanently deleted, '
           f'along with their leave and attendance records.', 'info')

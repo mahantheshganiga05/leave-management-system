@@ -42,7 +42,7 @@
       <h6 class="fw-bold mb-3">All Parents</h6>
       <div class="table-responsive">
         <table class="table align-middle">
-          <thead><tr><th>Name</th><th>Email</th><th>Children</th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Children</th><th>Actions</th></tr></thead>
           <tbody>
           {% for p in parents %}
             <tr>
@@ -51,9 +51,18 @@
               <td>
                 {% for c in p.children %}<span class="badge bg-light text-dark border">{{ c.user.full_name }}</span>{% else %}<span class="text-muted">None linked</span>{% endfor %}
               </td>
+              <td>
+                <form method="POST" action="{{ url_for('admin.delete_parent', parent_id=p.id) }}"
+                      onsubmit="return confirm('Are you sure you want to permanently delete {{ p.user.full_name }}? This cannot be undone.');"
+                      class="d-inline">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" {% if p.children %}disabled title="Unlink or delete their children first"{% endif %}>
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </form>
+              </td>
             </tr>
           {% else %}
-            <tr><td colspan="3" class="text-center text-muted py-4">No parents yet.</td></tr>
+            <tr><td colspan="4" class="text-center text-muted py-4">No parents yet.</td></tr>
           {% endfor %}
           </tbody>
         </table>
