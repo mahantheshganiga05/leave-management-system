@@ -1,5 +1,6 @@
 import os
 import uuid
+import threading
 from functools import wraps
 from flask import abort, current_app, request
 from flask_login import current_user
@@ -25,7 +26,6 @@ def role_required(*roles):
 def save_upload(file_storage, subfolder=None):
     """Save an uploaded file securely with a randomized filename. Returns (original_name, stored_name)."""
     from werkzeug.utils import secure_filename
-
     original_name = secure_filename(file_storage.filename)
     ext = original_name.rsplit('.', 1)[-1].lower()
     stored_name = f"{uuid.uuid4().hex}.{ext}"
@@ -60,13 +60,23 @@ def log_action(action, user_id=None):
     return entry
 
 
+def _send_async_email(app, msg):
+    """Runs in a background thread so a slow/hanging SMTP server can NEVER
+    block or crash the request-handling worker."""
+    with app.app_context():
+        try:
+            mail.send(msg)
+            app.logger.info(f"[EMAIL SENT] To: {msg.recipients} | Subject: {msg.subject}")
+        except Exception as exc:
+            app.logger.warning(f"[EMAIL FAILED] To: {msg.recipients} | Subject: {msg.subject} | Error: {exc}")
+
+
 def send_email(subject, recipients, body_html):
-    """Send an email. If mail credentials are not configured, this is a no-op
-    that Flask-Mail suppresses (MAIL_SUPPRESS_SEND), and content still goes
-    to the app logger for visibility during development."""
-    try:
-        msg = Message(subject=subject, recipients=recipients, html=body_html)
-        mail.send(msg)
-    except Exception as exc:  # pragma: no cover - defensive, mail is optional
-        current_app.logger.warning(f"Email send failed (subject={subject!r}): {exc}")
-    current_app.logger.info(f"[EMAIL] To: {recipients} | Subject: {subject}")
+    """Queue an email to be sent in the background. Returns immediately —
+    the HTTP request never waits on the SMTP connection."""
+    msg = Message(subject=subject, recipients=recipients, html=body_html)
+    app = current_app._get_current_object()
+    thread = threading.Thread(target=_send_async_email, args=(app, msg))
+    thread.daemon = True
+    thread.start()
+    current_app.logger.info(f"[EMAIL QUEUED] To: {recipients} | Subject: {subject}")
