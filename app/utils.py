@@ -1,22 +1,15 @@
 import os
 import uuid
-import socket
 import threading
 from functools import wraps
 from flask import abort, current_app, request
 from flask_login import current_user
-from flask_mail import Message
-from app.extensions import db, mail
+from app.extensions import db
 from app.models import Notification, AuditLog
 
-# --- Force IPv4 for outbound connections (fixes "Network is unreachable"
-# on Render's free tier, which has no IPv6 route to Gmail's SMTP server) ---
-_original_getaddrinfo = socket.getaddrinfo
+import resend
 
-def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
-    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
-
-socket.getaddrinfo = _getaddrinfo_ipv4_only
+resend.api_key = os.environ.get('RESEND_API_KEY')
 
 
 def role_required(*roles):
@@ -70,19 +63,30 @@ def log_action(action, user_id=None):
     return entry
 
 
-def _send_async_email(app, msg):
+def _send_async_email(app, subject, recipients, body_html):
+    """Runs in a background thread and uses Resend's HTTPS API (port 443)
+    instead of raw SMTP (port 587), because Render's free tier blocks
+    outbound SMTP traffic entirely. This also means the request never
+    waits on the email call, so a slow/failing send can never crash or
+    hang the request-handling worker."""
     with app.app_context():
         try:
-            mail.send(msg)
-            print(f"[EMAIL SENT] To: {msg.recipients} | Subject: {msg.subject}", flush=True)
+            resend.Emails.send({
+                "from": "Leave Management System <onboarding@resend.dev>",
+                "to": recipients,
+                "subject": subject,
+                "html": body_html,
+            })
+            print(f"[EMAIL SENT] To: {recipients} | Subject: {subject}", flush=True)
         except Exception as exc:
-            print(f"[EMAIL FAILED] To: {msg.recipients} | Subject: {msg.subject} | Error: {exc}", flush=True)
+            print(f"[EMAIL FAILED] To: {recipients} | Subject: {subject} | Error: {exc}", flush=True)
 
 
 def send_email(subject, recipients, body_html):
-    msg = Message(subject=subject, recipients=recipients, html=body_html)
+    """Queue an email to be sent in the background via Resend's API.
+    Returns immediately — the HTTP request never waits on the email send."""
     app = current_app._get_current_object()
-    thread = threading.Thread(target=_send_async_email, args=(app, msg))
+    thread = threading.Thread(target=_send_async_email, args=(app, subject, recipients, body_html))
     thread.daemon = True
     thread.start()
     print(f"[EMAIL QUEUED] To: {recipients} | Subject: {subject}", flush=True)
