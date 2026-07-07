@@ -1,5 +1,6 @@
 import os
 import uuid
+import socket
 import threading
 from functools import wraps
 from flask import abort, current_app, request
@@ -7,6 +8,15 @@ from flask_login import current_user
 from flask_mail import Message
 from app.extensions import db, mail
 from app.models import Notification, AuditLog
+
+# --- Force IPv4 for outbound connections (fixes "Network is unreachable"
+# on Render's free tier, which has no IPv6 route to Gmail's SMTP server) ---
+_original_getaddrinfo = socket.getaddrinfo
+
+def _getaddrinfo_ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+
+socket.getaddrinfo = _getaddrinfo_ipv4_only
 
 
 def role_required(*roles):
