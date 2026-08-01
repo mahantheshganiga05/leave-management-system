@@ -21,7 +21,7 @@ app = create_app(os.environ.get('FLASK_CONFIG', 'production'))
 # (or leave it — it's harmless since it won't create duplicates).
 # ---------------------------------------------------------------------------
 with app.app_context():
-    db.create_all()
+    #db.create_all()
 
     if os.environ.get('RUN_SEED_ON_START', 'false').lower() == 'true':
         from seed import run_seed
