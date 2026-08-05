@@ -1,67 +1,163 @@
 {% extends 'base.html' %}
-{% block title %}Welcome | Leave Management System{% endblock %}
+
+{% block title %}Welcome | College Leave Management System{% endblock %}
 
 {% block guest_content %}
 
 <section class="hero-section">
 
-    <div class="hero-card fade-up">
+    <div class="hero-left">
 
-        <!-- LEFT CONTENT -->
+        <span class="hero-badge">
+            <i class="bi bi-stars"></i>
+            Smart College Portal
+        </span>
 
-        <div class="hero-left">
+        <h1>
+            College Leave
+            <span>Management System</span>
+        </h1>
 
-            <div class="hero-logo">
-                <!-- ನಿಮ್ಮ Login Page ನಲ್ಲಿ ಬಳಸುವ ಅದೇ logo -->
-                <i class="bi bi-mortarboard-fill"></i>
+        <p>
+            A modern, secure and intelligent leave management platform
+            designed for
+            <strong>Students</strong>,
+            <strong>Faculty</strong>,
+            <strong>Parents</strong> and
+            <strong>Administrators</strong>.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Login
+            </a>
+
+        </div>
+
+        <div class="hero-features">
+
+            <div>
+                <i class="bi bi-check-circle-fill text-success"></i>
+                Online Leave Approval
             </div>
 
-            <span class="badge bg-light text-primary px-3 py-2 mb-3 rounded-pill">
-                College Management Portal
-            </span>
+            <div>
+                <i class="bi bi-check-circle-fill text-success"></i>
+                Real-Time Notifications
+            </div>
 
-            <h1>
-                Smart College
-                <br>
-                Leave Management
-                <br>
-                System
-            </h1>
+            <div>
+                <i class="bi bi-check-circle-fill text-success"></i>
+                Attendance Tracking
+            </div>
 
-            <p>
-                A modern digital platform for Students, Faculty,
-                Parents and Administrators to manage leave requests,
-                approvals, notifications and reports quickly and securely.
-            </p>
+            <div>
+                <i class="bi bi-check-circle-fill text-success"></i>
+                Secure Role-Based Access
+            </div>
 
-            <div class="d-flex flex-wrap gap-3 mt-4">
+        </div>
 
-                <a href="{{ url_for('auth.login') }}"
-                   class="hero-btn">
+    </div>
 
-                    <i class="bi bi-box-arrow-in-right"></i>
+    <div class="hero-right">
 
-                    Login Now
+        <img
+            src="{{ url_for('static', filename='images/landing.png') }}"
+            class="hero-image"
+            alt="College Leave Management">
 
-                </a>
+    </div>
+
+</section>
+
+<section class="container py-5">
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card text-center">
+
+                <i class="bi bi-mortarboard-fill feature-icon"></i>
+
+                <h5>Students</h5>
+
+                <p>
+                    Apply leave online, monitor request status,
+                    receive notifications instantly.
+                </p>
 
             </div>
 
         </div>
 
-        <!-- RIGHT CONTENT -->
+        <div class="col-lg-3 col-md-6">
 
-        <div class="hero-right">
+            <div class="feature-card text-center">
 
-            <img
-            src="https://undraw.co/api/illustrations/undraw_education.svg"
-            class="hero-image"
-            alt="College">
+                <i class="bi bi-person-workspace feature-icon"></i>
+
+                <h5>Faculty</h5>
+
+                <p>
+                    Review student leave requests,
+                    approve or reject with remarks.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card text-center">
+
+                <i class="bi bi-person-hearts feature-icon"></i>
+
+                <h5>Parents</h5>
+
+                <p>
+                    Stay informed about your child's
+                    leave history and approvals.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card text-center">
+
+                <i class="bi bi-shield-check feature-icon"></i>
+
+                <h5>Admin</h5>
+
+                <p>
+                    Complete control over users,
+                    reports, departments and leave management.
+                </p>
+
+            </div>
 
         </div>
 
     </div>
 
 </section>
+
+<footer class="text-center py-4">
+
+    <p class="text-muted mb-0">
+
+        © {{ current_year if current_year else '2026' }}
+        College Leave Management System
+
+    </p>
+
+</footer>
 
 {% endblock %}
