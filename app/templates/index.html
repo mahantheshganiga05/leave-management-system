@@ -1,163 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Welcome | College Leave Management System{% endblock %}
+{% block title %}
+Welcome - Leave Management System
+{% endblock %}
 
 {% block guest_content %}
 
-<section class="hero-section">
+<div class="auth-wrapper">
 
-    <div class="hero-left">
+    <div class="text-center text-white">
 
-        <span class="hero-badge">
-            <i class="bi bi-stars"></i>
-            Smart College Portal
-        </span>
+        <i class="bi bi-calendar2-check-fill" style="font-size:4rem;"></i>
 
-        <h1>
-            College Leave
-            <span>Management System</span>
+        <h1 class="fw-bold mt-3">
+            College Leave Management System
         </h1>
 
-        <p>
-            A modern, secure and intelligent leave management platform
-            designed for
-            <strong>Students</strong>,
-            <strong>Faculty</strong>,
-            <strong>Parents</strong> and
-            <strong>Administrators</strong>.
+        <p class="lead mb-4">
+            Admin &bull; Faculty &bull; Student &bull; Parent Portals
         </p>
 
-        <div class="hero-buttons">
-
-            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4">
-                <i class="bi bi-box-arrow-in-right"></i>
-                Login
-            </a>
-
-        </div>
-
-        <div class="hero-features">
-
-            <div>
-                <i class="bi bi-check-circle-fill text-success"></i>
-                Online Leave Approval
-            </div>
-
-            <div>
-                <i class="bi bi-check-circle-fill text-success"></i>
-                Real-Time Notifications
-            </div>
-
-            <div>
-                <i class="bi bi-check-circle-fill text-success"></i>
-                Attendance Tracking
-            </div>
-
-            <div>
-                <i class="bi bi-check-circle-fill text-success"></i>
-                Secure Role-Based Access
-            </div>
-
-        </div>
+        <a href="{{ url_for('auth.login') }}"
+           class="btn btn-light btn-lg px-5 fw-semibold">
+            Login to Continue
+        </a>
 
     </div>
 
-    <div class="hero-right">
-
-        <img
-            src="{{ url_for('static', filename='images/landing.png') }}"
-            class="hero-image"
-            alt="College Leave Management">
-
-    </div>
-
-</section>
-
-<section class="container py-5">
-
-    <div class="row g-4">
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="feature-card text-center">
-
-                <i class="bi bi-mortarboard-fill feature-icon"></i>
-
-                <h5>Students</h5>
-
-                <p>
-                    Apply leave online, monitor request status,
-                    receive notifications instantly.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="feature-card text-center">
-
-                <i class="bi bi-person-workspace feature-icon"></i>
-
-                <h5>Faculty</h5>
-
-                <p>
-                    Review student leave requests,
-                    approve or reject with remarks.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="feature-card text-center">
-
-                <i class="bi bi-person-hearts feature-icon"></i>
-
-                <h5>Parents</h5>
-
-                <p>
-                    Stay informed about your child's
-                    leave history and approvals.
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="feature-card text-center">
-
-                <i class="bi bi-shield-check feature-icon"></i>
-
-                <h5>Admin</h5>
-
-                <p>
-                    Complete control over users,
-                    reports, departments and leave management.
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<footer class="text-center py-4">
-
-    <p class="text-muted mb-0">
-
-        © {{ current_year if current_year else '2026' }}
-        College Leave Management System
-
-    </p>
-
-</footer>
+</div>
 
 {% endblock %}
